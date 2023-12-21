@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.xml.datatype.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +43,6 @@ public class OrderService {
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
-        orderRepository.save(order);
         // check
         Boolean check = Arrays.stream(inventoryResponses).allMatch(InventoryResponse::getIsInStocks);
         if(check){

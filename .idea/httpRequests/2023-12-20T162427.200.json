@@ -1,0 +1,25 @@
+{
+  "retryEvents": [
+    {
+      "retryName": "inventory",
+      "type": "RETRY",
+      "creationTime": "2023-12-20T16:19:03.111919600+07:00[Asia/Saigon]",
+      "errorMessage": "java.util.concurrent.TimeoutException: TimeLimiter 'inventory' recorded a timeout exception.",
+      "numberOfAttempts": 1
+    },
+    {
+      "retryName": "inventory",
+      "type": "RETRY",
+      "creationTime": "2023-12-20T16:19:11.123565900+07:00[Asia/Saigon]",
+      "errorMessage": "java.util.concurrent.TimeoutException: TimeLimiter 'inventory' recorded a timeout exception.",
+      "numberOfAttempts": 2
+    },
+    {
+      "retryName": "inventory",
+      "type": "ERROR",
+      "creationTime": "2023-12-20T16:19:19.146446400+07:00[Asia/Saigon]",
+      "errorMessage": "java.util.concurrent.TimeoutException: TimeLimiter 'inventory' recorded a timeout exception.",
+      "numberOfAttempts": 3
+    }
+  ]
+}
