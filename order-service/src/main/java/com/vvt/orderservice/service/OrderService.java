@@ -12,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import javax.xml.datatype.Duration;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +28,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClient;
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
-    public Boolean placeOrder(OrderRequest orderRequest){
+    public Boolean placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
 
@@ -39,21 +41,21 @@ public class OrderService {
         List<String> skuCodes = order.getOrderItemsList().stream().map(OrderItems::getSkuCode)
                 .collect(Collectors.toList());
 
-        // call Inventory service to check product is in stock;
-        InventoryResponse[] inventoryResponses = webClient.build().get()
-                .uri("http://inventory-service/api/inventory",
-                        uriBuilder -> uriBuilder.queryParam("SkuCode", skuCodes).build())
-                .retrieve()
-                .bodyToMono(InventoryResponse[].class)
-                .block();
-        // check
-        Boolean check = Arrays.stream(inventoryResponses).allMatch(InventoryResponse::getIsInStocks);
-        if(check){
-            orderRepository.save(order);
-            kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
-            return true;
-        }else{
-            return false;
+        try {
+            InventoryResponse[] inventoryResponses = webClient.build().get()
+                    .uri("http://inventory-service/api/inventory",
+                            uriBuilder -> uriBuilder.queryParam("SkuCode", skuCodes).build())
+                    .retrieve()
+                    .bodyToMono(InventoryResponse[].class)
+                    .timeout(Duration.ofSeconds(5)).block();
+            Boolean check = Arrays.stream(inventoryResponses).allMatch(InventoryResponse::getIsInStocks);
+            if(check){
+                orderRepository.save(order);
+//                kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
+                return true;
+            }else return false;
+        }catch (Exception e){
+            throw new RuntimeException();
         }
     }
 

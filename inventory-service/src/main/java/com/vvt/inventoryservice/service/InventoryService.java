@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class InventoryService {
     private final InventoryRepository inventoryRepository;
-//    @SneakyThrows
+    @SneakyThrows
     public List<InventoryResponse> isInStock(List<String> SkuCode){
 //        log.info("start");
-//        Thread.sleep(10000);
+        Thread.sleep(10000);
 //        log.info("end");
         return inventoryRepository.findBySkuCodeIn(SkuCode).stream()
                 .map(inventory -> InventoryResponse.builder()

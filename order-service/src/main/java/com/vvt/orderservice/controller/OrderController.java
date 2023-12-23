@@ -8,10 +8,7 @@ import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -36,5 +33,10 @@ public class OrderController {
     // runtimeException will consume all exception on father method
     public CompletableFuture<ResponseEntity<?>> fallBackPlaceOrder(OrderRequest orderRequest, RuntimeException runtimeException){
         return CompletableFuture.supplyAsync(() -> new ResponseEntity<>("oop, something went wrong, please try later!",HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @GetMapping("/error")
+    public ResponseEntity<?> getError(){
+        throw new RuntimeException("this is runtime errror");
     }
 }
